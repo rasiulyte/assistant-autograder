@@ -1,6 +1,25 @@
+
 # AI Assistant Response Autograder: LLM-as-Judge Evaluation System
 
-An experiment testing whether Claude can reliably evaluate AI assistant responses.
+A portfolio project demonstrating autograder design for AI assistant responses, built to explore prompt engineering techniques and LLM-as-Judge reliability.
+
+## Background & Motivation
+
+My background in traditional quality engineering shaped how I initially thought about failures. After spending time reading and experimenting with LLMs, I began to notice a different pattern: instead of obvious crashes or errors, failures are often subtle—confident but wrong answers, plausible hallucinations, or responses that are technically correct yet miss the user’s intent.
+
+This project explores a core question in GenAI evaluation: **How reliable are LLM-based autograders, and how do we validate them?**
+
+I hand-labeled 23 test cases with ground truth scores (the annotation work that underpins any evaluation system), then built and validated multiple autograder approaches to measure their correlation with human judgment.
+
+## Project Overview
+
+This project builds and validates an autograder system that evaluates AI assistant responses across multiple quality dimensions. It demonstrates:
+
+1. **Rubric Design** - Structured evaluation criteria including safety
+2. **Prompt Engineering** - Multiple prompting strategies (zero-shot, few-shot, chain-of-thought)
+3. **Autograder Validation** - Measuring correlation with human judgment
+4. **Bias Detection** - Identifying systematic autograder limitations
+5. **Hillclimbing Methodology** - Iterating to improve autograder accuracy
 
 ## What This Project Does
 
