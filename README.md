@@ -21,6 +21,10 @@ This project builds and validates an autograder system that evaluates AI assista
 4. **Bias Detection** - Identifying systematic autograder limitations
 5. **Failure Analysis** - Pinpointing where autograders disagree with humans
 
+## Scope & Limitations
+
+This repository is a personal learning exercise and a simplified illustration of LLM-as-judge autograding. It is not a production-ready framework—just a starting point I used to think through rubrics, prompting strategies, and validation for myself. 
+
 ## What This Project Does
 
 1. I created 23 example AI assistant conversations and manually scored them (the "ground truth")
