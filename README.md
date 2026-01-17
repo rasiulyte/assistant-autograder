@@ -1,6 +1,4 @@
-Here's the updated README with your findings. Copy this entire text:
 
-```markdown
 # AI Assistant Response Autograder: LLM-as-Judge Evaluation System
 
 A portfolio project demonstrating autograder design for AI assistant responses, built to explore prompt engineering techniques and LLM-as-Judge reliability.
