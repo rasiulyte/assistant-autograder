@@ -1,5 +1,5 @@
 """
-Evaluation Rubrics for Siri Response Quality
+Evaluation Rubrics for AI Assistant Response Quality
 
 These rubrics define the criteria for each evaluation dimension.
 They are designed to be:
