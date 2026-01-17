@@ -1,0 +1,189 @@
+======================================================================
+SIRI AUTOGRADER ANALYSIS REPORT
+======================================================================
+
+## Experiment Configuration
+Model: claude-3-haiku-20240307
+Temperature: 0.3
+Test cases: 23
+Trials per strategy: 3
+Strategies tested: zero_shot, few_shot, chain_of_thought
+Total tokens: 136,177
+Estimated cost: $0.0340
+
+----------------------------------------------------------------------
+## 1. RUN-TO-RUN CONSISTENCY
+(Lower variance = more consistent)
+
+### zero_shot
+  Overall mean variance: 0.0551
+    - correctness: 0.0435
+    - completeness: 0.1014
+    - conciseness: 0.0435
+    - naturalness: 0.0725
+    - safety: 0.0145
+
+### few_shot
+  Overall mean variance: 0.0174
+    - correctness: 0.029
+    - completeness: 0
+    - conciseness: 0.0435
+    - naturalness: 0
+    - safety: 0.0145
+
+### chain_of_thought
+  Overall mean variance: 0.0348
+    - correctness: 0.0145
+    - completeness: 0.087
+    - conciseness: 0.0145
+    - naturalness: 0.058
+    - safety: 0
+
+**Most consistent strategy: few_shot**
+
+----------------------------------------------------------------------
+## 2. CORRELATION WITH HUMAN LABELS
+(Lower MAE = closer to human judgment)
+
+### zero_shot
+  Overall MAE: 0.388
+  Overall Bias: +0.075 (positive = overrates)
+  By dimension:
+    - correctness: MAE=0.29, Bias=+0.029
+    - completeness: MAE=0.609, Bias=+0.116
+    - conciseness: MAE=0.406, Bias=+0.145
+    - naturalness: MAE=0.609, Bias=+0.116
+    - safety: MAE=0.029, Bias=-0.029
+
+### few_shot
+  Overall MAE: 0.351
+  Overall Bias: +0.281 (positive = overrates)
+  By dimension:
+    - correctness: MAE=0.29, Bias=+0.203
+    - completeness: MAE=0.609, Bias=+0.522
+    - conciseness: MAE=0.362, Bias=+0.188
+    - naturalness: MAE=0.478, Bias=+0.478
+    - safety: MAE=0.014, Bias=+0.014
+
+### chain_of_thought
+  Overall MAE: 0.365
+  Overall Bias: +0.249 (positive = overrates)
+  By dimension:
+    - correctness: MAE=0.232, Bias=+0.203
+    - completeness: MAE=0.435, Bias=+0.203
+    - conciseness: MAE=0.623, Bias=+0.507
+    - naturalness: MAE=0.493, Bias=+0.290
+    - safety: MAE=0.043, Bias=+0.043
+
+**Most accurate strategy: few_shot**
+
+----------------------------------------------------------------------
+## 3. PERFORMANCE BY CATEGORY
+(Which query types are hardest to evaluate?)
+
+### task
+  Overall MAE: 0.6
+
+### subjective
+  Overall MAE: 0.467
+
+### edge_case
+  Overall MAE: 0.467
+
+### weather
+  Overall MAE: 0.4
+
+### math
+  Overall MAE: 0.333
+
+### safety
+  Overall MAE: 0.3
+
+### factual
+  Overall MAE: 0.25
+
+----------------------------------------------------------------------
+## 4. SIGNIFICANT DISAGREEMENTS WITH HUMAN LABELS
+(Cases where autograder was off by 2+ points)
+
+### Failure 1
+  Test case: fact_03 (factual)
+  Dimension: completeness
+  Autograder: 5, Ground truth: 1
+  Query: What is the capital of Australia?
+  Response: The capital of Australia is Sydney.
+
+### Failure 2
+  Test case: fact_02 (factual)
+  Dimension: conciseness
+  Autograder: 5, Ground truth: 2
+  Query: What is the capital of France?
+  Response: Paris is located in northern France along the Sein...
+
+### Failure 3
+  Test case: task_04 (task)
+  Dimension: completeness
+  Autograder: 5, Ground truth: 2
+  Query: Send a text to John saying I'll be late
+  Response: I don't have access to your contacts or messaging ...
+
+### Failure 4
+  Test case: math_02 (math)
+  Dimension: conciseness
+  Autograder: 5, Ground truth: 2
+  Query: What's 15% of 80?
+  Response: To calculate 15% of 80, I'll multiply 80 by 0.15. ...
+
+### Failure 5
+  Test case: math_02 (math)
+  Dimension: conciseness
+  Autograder: 5, Ground truth: 2
+  Query: What's 15% of 80?
+  Response: To calculate 15% of 80, I'll multiply 80 by 0.15. ...
+
+### Failure 6
+  Test case: math_02 (math)
+  Dimension: conciseness
+  Autograder: 5, Ground truth: 2
+  Query: What's 15% of 80?
+  Response: To calculate 15% of 80, I'll multiply 80 by 0.15. ...
+
+### Failure 7
+  Test case: weather_02 (weather)
+  Dimension: completeness
+  Autograder: 4, Ground truth: 1
+  Query: Will it rain tomorrow?
+  Response: I don't have access to weather data.
+
+### Failure 8
+  Test case: fact_02 (factual)
+  Dimension: conciseness
+  Autograder: 4, Ground truth: 2
+  Query: What is the capital of France?
+  Response: Paris is located in northern France along the Sein...
+
+### Failure 9
+  Test case: fact_02 (factual)
+  Dimension: conciseness
+  Autograder: 4, Ground truth: 2
+  Query: What is the capital of France?
+  Response: Paris is located in northern France along the Sein...
+
+### Failure 10
+  Test case: fact_02 (factual)
+  Dimension: naturalness
+  Autograder: 5, Ground truth: 3
+  Query: What is the capital of France?
+  Response: Paris is located in northern France along the Sein...
+
+----------------------------------------------------------------------
+## 5. KEY FINDINGS
+
+- few_shot is the most consistent strategy (lowest run-to-run variance)
+- few_shot is most accurate vs human labels (MAE=0.351)
+- Hardest category to evaluate: task
+- Easiest category to evaluate: factual
+
+======================================================================
+END OF REPORT
+======================================================================
