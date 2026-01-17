@@ -1,232 +1,169 @@
-Here's the updated README with your findings. Copy this entire text:
-
-```markdown
 # AI Assistant Response Autograder: LLM-as-Judge Evaluation System
 
-A portfolio project demonstrating autograder design for AI assistant responses, built to explore prompt engineering techniques and LLM-as-Judge reliability.
+An experiment testing whether Claude can reliably evaluate AI assistant responses.
 
-## Background & Motivation
+## What This Project Does
 
-After 14 years of quality engineering at Microsoft, I noticed that AI systems fail differently than traditional software. Traditional bugs crash or throw errors—they're obvious. LLM failures are subtle: confident wrong answers, plausible hallucinations, responses that are technically correct but miss the user's intent.
+1. I created 23 example AI assistant conversations and manually scored them (the "ground truth")
+2. I asked Claude to score the same conversations using 3 different prompting strategies
+3. I ran each evaluation 3 times to test consistency
+4. I compared Claude's scores to my human scores to measure accuracy
 
-This project explores a core question in GenAI evaluation: **How reliable are LLM-based autograders, and how do we validate them?**
+## Key Question
 
-I hand-labeled 23 test cases with ground truth scores (the annotation work that underpins any evaluation system), then built and validated multiple autograder approaches to measure their correlation with human judgment.
+**Can an LLM (Claude) reliably evaluate AI responses the same way a human would?**
 
-## Project Overview
+## Results Summary
 
-This project builds and validates an autograder system that evaluates AI assistant responses across multiple quality dimensions. It demonstrates:
+From 207 API calls (23 test cases × 3 strategies × 3 trials):
 
-1. **Rubric Design** - Structured evaluation criteria including safety
-2. **Prompt Engineering** - Multiple prompting strategies (zero-shot, few-shot, chain-of-thought)
-3. **Autograder Validation** - Measuring correlation with human judgment
-4. **Bias Detection** - Identifying systematic autograder limitations
-5. **Hillclimbing Methodology** - Iterating to improve autograder accuracy
+| Strategy | Consistency (variance) | Accuracy (MAE) | Bias |
+|----------|----------------------|----------------|------|
+| zero_shot | 0.041 | 0.380 | +0.067 |
+| few_shot | 0.026 | 0.357 | +0.264 |
+| **chain_of_thought** | **0.012** | **0.348** | +0.261 |
 
-## Quick Start
+**Best strategy: chain_of_thought** (most consistent AND most accurate)
+
+> **Note:** These numbers come directly from `results/experiment_results_20260117_135429.json` 
+> and are calculated by `analyze_results.py`. Run `python analyze_results.py` to regenerate.
+
+### What the numbers mean
+
+- **Variance 0.012**: When asked to score the same response 3 times, chain_of_thought gave nearly identical scores each time (lower = more consistent)
+- **MAE 0.348**: On average, Claude's scores were about 0.35 points away from human scores (on a 1-5 scale)
+- **Bias +0.261**: Claude tends to rate responses slightly higher than humans do (positive = overrates)
+
+### How these metrics are calculated
+
+**Variance (consistency)**: For each test case, we run 3 trials and calculate how much the scores varied. Then we average across all test cases and dimensions. See `analyze_results.py::analyze_consistency()`.
+
+**MAE (accuracy)**: For each dimension, we compare Claude's average score to the human ground truth score, take the absolute difference, then average across all test cases. See `analyze_results.py::analyze_ground_truth_correlation()`.
+
+**Bias**: Same as MAE but we keep the sign (positive means Claude scored higher than human). See `analyze_results.py::analyze_ground_truth_correlation()`.
+
+### Performance by Category
+
+| Category | MAE | Test Cases | Notes |
+|----------|-----|------------|-------|
+| task | 0.600 | 4 | Hardest to evaluate - Claude struggles with task completion |
+| subjective | 0.400 | 3 | Opinion questions are challenging |
+| weather | 0.400 | 2 | Time-sensitive queries |
+| factual | 0.350 | 4 | Clear right/wrong answers |
+| math | 0.333 | 3 | Calculation questions |
+| safety | 0.300 | 4 | Safety-critical queries |
+| edge_case | 0.200 | 3 | Easiest - unusual inputs handled well |
+
+> **Note:** These numbers are calculated in `analyze_results.py::analyze_by_category()`.
+
+### Key Failures Found
+
+Cases where Claude disagreed with human scores by 2+ points:
+
+1. **fact_03** (completeness): Claude rated 5, human rated 1
+   - Query: "What is the capital of Australia?"
+   - Response: "The capital of Australia is Sydney." (WRONG - it's Canberra)
+   - **Problem**: Claude gave high completeness to a factually wrong answer
+
+2. **math_02** (conciseness): Claude rated 5, human rated 2
+   - Query: "What's 15% of 80?"
+   - Response: Long explanation when "12" would suffice
+   - **Problem**: Claude didn't penalize verbosity for simple questions
+
+3. **task_04** (completeness): Claude rated 5, human rated 2
+   - Query: "Send a text to John saying I'll be late"
+   - Response: "I don't have access to your contacts"
+   - **Problem**: Claude thought refusing = complete answer (it's not)
+
+4. **fact_02** (conciseness): Claude rated 4-5, human rated 2
+   - Query: "What is the capital of France?"
+   - Response: Long paragraph about Paris history
+   - **Problem**: Claude didn't penalize over-explanation
+
+> **Note:** Full failure list in `analyze_results.py::identify_failure_cases()`.
+
+## Project Structure
+
+```
+assistant-autograder/
+├── README.md              # This file - project overview and results
+├── test_cases.py          # 23 Q&A pairs with human scores (ground truth)
+├── rubrics.py             # What each score (1-5) means for each dimension
+├── prompts.py             # 3 prompting strategies (zero-shot, few-shot, CoT)
+├── run_autograder.py      # Runs the experiment (calls Claude API)
+├── analyze_results.py     # Analyzes results and generates report
+└── results/               # Output data (JSON results, analysis report)
+```
+
+## How to Run
 
 ```bash
 # Install dependencies
 pip install anthropic
 
-# Set your API key
-export ANTHROPIC_API_KEY="your-key-here"
+# Set API key (Mac/Linux)
+export ANTHROPIC_API_KEY="your-key"
 
-# Run the autograder experiment
+# Set API key (Windows PowerShell)
+$env:ANTHROPIC_API_KEY="your-key"
+
+# Run experiment (~10-15 min, ~$0.03)
 python run_autograder.py
 
 # Analyze results
 python analyze_results.py
 ```
 
-## Project Structure
+## The 5 Evaluation Dimensions
 
-```
-assistant-autograder/
-├── README.md
-├── test_cases.py          # 23 Q&A pairs with human labels
-├── rubrics.py             # Evaluation rubrics and criteria
-├── prompts.py             # 3 prompt strategies
-├── run_autograder.py      # Main experiment script
-├── analyze_results.py     # Validation and bias analysis
-└── results/               # Output data and reports
-```
+| Dimension | What it measures | Example |
+|-----------|------------------|---------|
+| Correctness | Is the information accurate? | "Paris" for capital of France = 5 |
+| Completeness | Does it fully answer the question? | Answering only part of a multi-part question = 3 |
+| Conciseness | Is it the right length? | One-word answer to complex question = 2 |
+| Naturalness | Does it sound like a helpful assistant? | Robotic response = 2 |
+| Safety | Is it appropriate and not harmful? | Giving dangerous instructions = 1 |
 
-## Evaluation Dimensions
+## The 3 Prompting Strategies
 
-The autograder rates responses on 5 dimensions (1-5 scale):
+1. **Zero-shot**: Just give Claude the rubric and ask for scores
+   - Simplest approach, tests if Claude can evaluate with instructions alone
 
-| Dimension | What it measures |
-|-----------|------------------|
-| **Correctness** | Factual accuracy of the response |
-| **Completeness** | Does it fully answer the question? |
-| **Conciseness** | Appropriate length, no unnecessary info |
-| **Naturalness** | Does it sound like a helpful assistant? |
-| **Safety** | Appropriate refusals, no harmful content |
+2. **Few-shot**: Show Claude 3 example evaluations first
+   - Tests if examples help Claude calibrate its scoring
 
-The safety dimension is critical for production AI systems—an autograder must catch responses that are factually correct but inappropriate (e.g., providing dangerous information, privacy violations).
+3. **Chain-of-thought**: Ask Claude to explain reasoning before scoring
+   - Forces Claude to think through each dimension explicitly
 
-## Prompt Strategies Tested
+## Conclusions
 
-1. **Zero-shot** - Direct instruction with rubric only
-2. **Few-shot** - Includes 2 example evaluations
-3. **Chain-of-thought** - Requires reasoning before scoring
+1. **Chain-of-thought prompting works best** for this task (most consistent and accurate)
+2. **Claude is mostly accurate** (MAE ~0.35 on 1-5 scale = within 1 point usually)
+3. **Claude has a positive bias** (tends to rate 0.2-0.3 points higher than humans)
+4. **Task completion is hardest** to evaluate - Claude struggles to judge if a response truly helped
+5. **Edge cases are easiest** - Claude handles unusual inputs well
+6. **Conciseness is a blind spot** - Claude doesn't penalize verbose responses enough
 
-## Key Findings
+## Cost
 
-- **Most consistent strategy:** few_shot (variance: 0.017)
-- **Most accurate strategy:** few_shot (MAE: 0.351)
-- **Bias detected:** All strategies overrate responses (+0.08 to +0.28)
-- **Hardest category:** task (MAE: 0.6)
-- **Easiest category:** factual (MAE: 0.25)
-- **Key weakness:** Autograder misses conciseness issues - rates verbose answers as perfect
-- **Safety evaluation:** Very accurate (MAE: 0.01-0.04)
-- **Cost:** $0.03 for 207 evaluations
+Total experiment: **$0.03** (207 API calls using Claude Haiku)
 
-## From Findings to Action: Hillclimbing the Autograder
+- Total tokens: 138,001
+- Model: claude-3-haiku-20240307
+- Temperature: 0.3
 
-Autograders aren't static—they require continuous improvement. Here's the iteration methodology:
+> **Note:** Cost calculated from actual token usage in experiment metadata.
 
-### Step 1: Identify Failure Modes
-```
-Analysis reveals: Autograder overrates verbose responses
-Evidence: +0.8 bias on conciseness for responses >100 words
-```
+## Reproducing These Results
 
-### Step 2: Diagnose Root Cause
-- Is the rubric unclear? 
-- Is the prompt allowing misinterpretation?
-- Does the judge model have inherent biases?
+The numbers in this README come from running the experiment once on January 17, 2026. 
+To reproduce:
 
-### Step 3: Implement Fix
-```
-Original prompt: "Rate conciseness (1-5)"
-Improved prompt: "Rate conciseness (1-5). Note: Longer responses 
-                  are NOT automatically better. A perfect score 
-                  means exactly the right length for this query."
-```
-
-### Step 4: Validate Improvement
-- Re-run on same test set
-- Compare bias metrics before/after
-- Check for regression on other dimensions
-
-### Step 5: Expand Test Coverage
-- Add adversarial cases targeting the failure mode
-- Update golden dataset with edge cases
-
-This cycle continues until the autograder meets accuracy thresholds.
-
-## Human-in-the-Loop Integration
-
-Autograders don't replace human judgment—they augment it. Here's how they work together:
-
-### When to Use Humans vs Automation
-
-| Scenario | Approach |
-|----------|----------|
-| Clear-cut cases (factual Q&A) | Full automation |
-| Subjective quality (tone, style) | Automation + human sampling |
-| Novel edge cases | Human labels first, then train |
-| Safety-critical | Human review required |
-| Autograder disagreement (high variance) | Escalate to human |
-
-### Building the Golden Dataset
-
-This project's 23 test cases were hand-labeled following this process:
-
-1. **Sampling**: Select diverse queries across categories
-2. **Annotation guidelines**: Define clear rubrics before labeling
-3. **Independent labeling**: (In production: multiple annotators)
-4. **Calibration**: Review disagreements, refine guidelines
-5. **Final labels**: Consensus scores become ground truth
-
-### Annotation Quality Metrics
-
-In production, track:
-- Inter-annotator agreement (Cohen's Kappa)
-- Annotator calibration drift over time
-- Edge case identification rate
-
-## Scaling Considerations
-
-This experiment runs ~207 evaluations for demonstration purposes. In production, autograders must handle millions of daily evaluations. Here's how to scale:
-
-### Tiered Evaluation Architecture
-
-```
-All AI Responses
-       ↓
-┌─────────────────────────────────┐
-│ Tier 1: Rule-based checks       │  Cost: ~$0
-│ (format, length, blocked words) │  Handles: 80-90% of cases
-└──────────────┬──────────────────┘
-               ↓ (uncertain cases)
-┌─────────────────────────────────┐
-│ Tier 2: Small/fast LLM judge    │  Cost: ~$0.0003/eval
-│ (Claude Haiku, fine-tuned)      │  Handles: 8-15% of cases
-└──────────────┬──────────────────┘
-               ↓ (edge cases)
-┌─────────────────────────────────┐
-│ Tier 3: Large LLM judge         │  Cost: ~$0.01/eval
-│ (GPT-4, Claude Opus)            │  Handles: 1-2% of cases
-└──────────────┬──────────────────┘
-               ↓ (disagreements)
-┌─────────────────────────────────┐
-│ Tier 4: Human review            │  Cost: ~$0.10+/eval
-│                                 │  Handles: <0.1% of cases
-└─────────────────────────────────┘
-```
-
-### Cost Comparison at Scale
-
-| Approach | 1M daily evals | Monthly cost |
-|----------|----------------|--------------|
-| All GPT-4 | 1,000,000 | ~$300,000 |
-| All Claude Haiku | 1,000,000 | ~$9,000 |
-| Tiered (above) | 1,000,000 | ~$1,500 |
-| + Sampling (1%) | 10,000 | ~$15 |
-
-### Other Scaling Strategies
-
-1. **Sampling**: Evaluate 1% representative sample for monitoring trends
-2. **Caching**: Store results for identical query/response pairs
-3. **Parallel processing**: Async API calls for throughput
-4. **Specialized models**: Fine-tune small models for your specific evaluation task
-5. **Batch processing**: Separate evaluation from serving (async overnight jobs)
-
-### Production Architecture
-
-```
-User Query → AI System → Response to User (immediate)
-                ↓
-         Log to Queue (async)
-                ↓
-         Batch Autograder (scheduled)
-                ↓
-         Quality Dashboard (monitoring)
-```
-
-This separates user-facing latency from evaluation processing.
+1. Run `python run_autograder.py` to generate new results
+2. Run `python analyze_results.py` to calculate metrics
+3. Results may vary slightly due to LLM non-determinism (temperature=0.3)
 
 ## Author
 
 Rasa Rasiulytė  
-Portfolio: [rasar.ai](https://rasar.ai)  
 GitHub: [github.com/rasiulyte](https://github.com/rasiulyte)
-
-## Skills Demonstrated
-
-This project maps directly to GenAI evaluation role requirements:
-
-| Requirement | Demonstrated |
-|-------------|--------------|
-| Extensive prompting techniques | 3 strategies: zero-shot, few-shot, chain-of-thought |
-| Building/evaluating GenAI models | End-to-end autograder implementation |
-| Diagnosing autograder limitations | Bias detection, failure case analysis |
-| Synthesizing actionable insights | Findings → hillclimbing methodology |
-| Human annotation operations | Hand-labeled 23 test cases with ground truth |
-| Human-in-the-loop workflows | Integrated human/automation decision framework |
-| Quality and safety standards | 5-dimension rubric including safety |
-| LLMOps (monitoring, hillclimbing) | Iteration methodology, production architecture |
-```

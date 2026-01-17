@@ -1,5 +1,5 @@
 ======================================================================
-SIRI AUTOGRADER ANALYSIS REPORT
+AI ASSISTANT AUTOGRADER ANALYSIS REPORT
 ======================================================================
 
 ## Experiment Configuration
@@ -8,74 +8,74 @@ Temperature: 0.3
 Test cases: 23
 Trials per strategy: 3
 Strategies tested: zero_shot, few_shot, chain_of_thought
-Total tokens: 136,177
-Estimated cost: $0.0340
+Total tokens: 138,001
+Estimated cost: $0.0345
 
 ----------------------------------------------------------------------
 ## 1. RUN-TO-RUN CONSISTENCY
 (Lower variance = more consistent)
 
 ### zero_shot
-  Overall mean variance: 0.0551
-    - correctness: 0.0435
-    - completeness: 0.1014
-    - conciseness: 0.0435
+  Overall mean variance: 0.0406
+    - correctness: 0.029
+    - completeness: 0.029
+    - conciseness: 0.058
     - naturalness: 0.0725
     - safety: 0.0145
 
 ### few_shot
-  Overall mean variance: 0.0174
+  Overall mean variance: 0.0261
     - correctness: 0.029
-    - completeness: 0
-    - conciseness: 0.0435
-    - naturalness: 0
-    - safety: 0.0145
-
-### chain_of_thought
-  Overall mean variance: 0.0348
-    - correctness: 0.0145
-    - completeness: 0.087
-    - conciseness: 0.0145
-    - naturalness: 0.058
+    - completeness: 0.029
+    - conciseness: 0.029
+    - naturalness: 0.0435
     - safety: 0
 
-**Most consistent strategy: few_shot**
+### chain_of_thought
+  Overall mean variance: 0.0116
+    - correctness: 0
+    - completeness: 0.0145
+    - conciseness: 0
+    - naturalness: 0.0435
+    - safety: 0
+
+**Most consistent strategy: chain_of_thought**
 
 ----------------------------------------------------------------------
 ## 2. CORRELATION WITH HUMAN LABELS
 (Lower MAE = closer to human judgment)
 
 ### zero_shot
-  Overall MAE: 0.388
-  Overall Bias: +0.075 (positive = overrates)
+  Overall MAE: 0.38
+  Overall Bias: +0.067 (positive = overrates)
   By dimension:
-    - correctness: MAE=0.29, Bias=+0.029
-    - completeness: MAE=0.609, Bias=+0.116
-    - conciseness: MAE=0.406, Bias=+0.145
-    - naturalness: MAE=0.609, Bias=+0.116
+    - correctness: MAE=0.261, Bias=+0.029
+    - completeness: MAE=0.594, Bias=+0.101
+    - conciseness: MAE=0.42, Bias=+0.159
+    - naturalness: MAE=0.594, Bias=+0.072
     - safety: MAE=0.029, Bias=-0.029
 
 ### few_shot
-  Overall MAE: 0.351
-  Overall Bias: +0.281 (positive = overrates)
+  Overall MAE: 0.357
+  Overall Bias: +0.264 (positive = overrates)
   By dimension:
-    - correctness: MAE=0.29, Bias=+0.203
+    - correctness: MAE=0.304, Bias=+0.217
     - completeness: MAE=0.609, Bias=+0.522
-    - conciseness: MAE=0.362, Bias=+0.188
-    - naturalness: MAE=0.478, Bias=+0.478
-    - safety: MAE=0.014, Bias=+0.014
+    - conciseness: MAE=0.377, Bias=+0.145
+    - naturalness: MAE=0.493, Bias=+0.435
+    - safety: MAE=0, Bias=+0.000
 
 ### chain_of_thought
-  Overall MAE: 0.365
-  Overall Bias: +0.249 (positive = overrates)
+  Overall MAE: 0.348
+  Overall Bias: +0.261 (positive = overrates)
   By dimension:
-    - correctness: MAE=0.232, Bias=+0.203
-    - completeness: MAE=0.435, Bias=+0.203
-    - conciseness: MAE=0.623, Bias=+0.507
-    - naturalness: MAE=0.493, Bias=+0.290
+    - correctness: MAE=0.217, Bias=+0.217
+    - completeness: MAE=0.406, Bias=+0.203
+    - conciseness: MAE=0.609, Bias=+0.522
+    - naturalness: MAE=0.464, Bias=+0.319
     - safety: MAE=0.043, Bias=+0.043
 
-**Most accurate strategy: few_shot**
+**Most accurate strategy: chain_of_thought**
 
 ----------------------------------------------------------------------
 ## 3. PERFORMANCE BY CATEGORY
@@ -85,13 +85,13 @@ Estimated cost: $0.0340
   Overall MAE: 0.6
 
 ### subjective
-  Overall MAE: 0.467
-
-### edge_case
-  Overall MAE: 0.467
+  Overall MAE: 0.4
 
 ### weather
   Overall MAE: 0.4
+
+### factual
+  Overall MAE: 0.35
 
 ### math
   Overall MAE: 0.333
@@ -99,8 +99,8 @@ Estimated cost: $0.0340
 ### safety
   Overall MAE: 0.3
 
-### factual
-  Overall MAE: 0.25
+### edge_case
+  Overall MAE: 0.2
 
 ----------------------------------------------------------------------
 ## 4. SIGNIFICANT DISAGREEMENTS WITH HUMAN LABELS
@@ -177,12 +177,14 @@ Estimated cost: $0.0340
   Response: Paris is located in northern France along the Sein...
 
 ----------------------------------------------------------------------
-## 5. KEY FINDINGS
+## 5. KEY FINDINGS SUMMARY
 
-- few_shot is the most consistent strategy (lowest run-to-run variance)
-- few_shot is most accurate vs human labels (MAE=0.351)
+- chain_of_thought is the most consistent strategy (lowest variance)
+- chain_of_thought is most accurate vs human labels (MAE=0.348)
+- few_shot tends to overrates responses (bias=+0.264)
+- chain_of_thought tends to overrates responses (bias=+0.261)
 - Hardest category to evaluate: task
-- Easiest category to evaluate: factual
+- Easiest category to evaluate: edge_case
 
 ======================================================================
 END OF REPORT

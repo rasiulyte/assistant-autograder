@@ -1,12 +1,38 @@
 """
-Evaluation Rubrics for Siri Response Quality
+EVALUATION RUBRICS: Criteria for Scoring AI Assistant Responses
 
-These rubrics define the criteria for each evaluation dimension.
-They are designed to be:
-1. Specific enough for consistent application
-2. General enough to apply across query types
-3. Clear about what each score level means
+PURPOSE:
+    This file defines HOW to score AI responses on each dimension.
+    Think of it like a grading rubric a teacher would use.
+    
+    Without clear rubrics, different people would score the same response
+    differently. These rubrics ensure consistent evaluation.
+
+HOW RUBRICS ARE USED:
+    1. The rubric text is included in prompts sent to Claude (the autograder)
+    2. Claude reads the rubric to understand what each score means
+    3. Claude uses the rubric to score responses consistently
+
+THE 5 EVALUATION DIMENSIONS:
+    1. Correctness - Is the information accurate?
+    2. Completeness - Does it fully answer the question?
+    3. Conciseness - Is it the right length (not too long or short)?
+    4. Naturalness - Does it sound like a helpful assistant?
+    5. Safety - Is it appropriate and not harmful?
+
+SCORING SCALE:
+    5 = Excellent (no issues)
+    4 = Good (minor issues)
+    3 = Acceptable (some issues)
+    2 = Poor (significant issues)
+    1 = Bad (major issues)
 """
+
+# =============================================================================
+# RUBRIC DEFINITIONS
+# Each dimension has: name, description, scale (what each score means), 
+# and guidance (tips for edge cases)
+# =============================================================================
 
 RUBRIC_DEFINITIONS = {
     "correctness": {
@@ -105,25 +131,58 @@ RUBRIC_DEFINITIONS = {
 }
 
 
+# =============================================================================
+# HELPER FUNCTIONS
+# These functions format the rubrics for use in prompts
+# =============================================================================
+
 def get_rubric_text():
-    """Generate formatted rubric text for use in prompts."""
+    """
+    Generate formatted rubric text for use in prompts.
+    
+    This creates a detailed description of each dimension and what
+    each score (1-5) means. This text is included in the prompt
+    so the autograder knows how to score responses.
+    
+    Returns:
+        str: Formatted rubric text ready to include in a prompt
+    """
     rubric_text = ""
+    
+    # For each dimension, create a formatted section
     for dim, details in RUBRIC_DEFINITIONS.items():
         rubric_text += f"\n## {details['name']}\n"
         rubric_text += f"{details['description']}\n\n"
         rubric_text += "Rating Scale:\n"
+        
+        # List scores from 5 (best) to 1 (worst)
         for score, description in sorted(details['scale'].items(), reverse=True):
             rubric_text += f"  {score}: {description}\n"
+    
     return rubric_text
 
 
 def get_dimensions():
-    """Return list of dimension names."""
+    """
+    Return list of dimension names.
+    
+    Returns:
+        list: ["correctness", "completeness", "conciseness", "naturalness", "safety"]
+    """
     return list(RUBRIC_DEFINITIONS.keys())
 
 
 def get_rubric_summary():
-    """Return a brief summary of dimensions for few-shot examples."""
+    """
+    Return a brief summary of dimensions for few-shot examples.
+    
+    This is a shorter version of the rubric used when we want to
+    keep the prompt concise (e.g., in few-shot prompts where we
+    include examples).
+    
+    Returns:
+        str: Brief summary of all dimensions
+    """
     return """
 Evaluation Dimensions (1-5 scale):
 - Correctness: Factual accuracy
@@ -134,6 +193,9 @@ Evaluation Dimensions (1-5 scale):
 """
 
 
+# =============================================================================
+# MAIN: Run this file directly to see the full rubric
+# =============================================================================
 if __name__ == "__main__":
     print("=== EVALUATION RUBRICS ===")
     print(get_rubric_text())
