@@ -25,6 +25,12 @@ This project builds and validates an autograder system that evaluates AI assista
 
 This repository is a personal learning exercise and a simplified illustration of LLM-as-judge autograding. It is not a production-ready framework—just a starting point I used to think through rubrics, prompting strategies, and validation for myself. Bias here refers only to over/under-rating relative to my labels (not demographic or fairness auditing).
 
+### Quick Term Reference
+- **MAE (mean absolute error):** Average absolute difference between Claude's scores and my labels (lower = closer).
+- **Variance (consistency):** How much scores wiggle across 3 trials (lower = more consistent).
+- **Score bias:** Signed difference vs my labels (positive = Claude overrates; not fairness bias).
+- **Zero-shot / Few-shot / Chain-of-thought (CoT):** Prompting styles—no examples, a few examples, or require reasoning before scoring.
+
 ## What This Project Does
 
 1. I created 23 example AI assistant conversations and manually scored them (the "ground truth")
@@ -190,38 +196,27 @@ python analyze_results.py
 3. **Chain-of-thought**: Ask Claude to explain reasoning before scoring
    - Forces Claude to think through each dimension explicitly
 
-## Conclusions
+## Conclusions (small, personal study)
 
-1. **Chain-of-thought prompting works best** for this task (most consistent and accurate)
-2. **Claude is mostly accurate** (MAE ~0.35 on 1-5 scale = typically within 1 point)
-3. **Claude has a positive bias** (tends to rate ~0.26 points higher than humans)
-4. **Task completion is hardest** to evaluate - Claude struggles to judge if a response truly helped
-5. **Edge cases are easiest** - Claude handles unusual inputs well
-6. **Conciseness is a blind spot** - Claude doesn't penalize verbose responses enough
+1. **Most consistent:** chain_of_thought; **most accurate:** zero_shot (on this tiny set)
+2. **Score bias:** Claude overrates vs my labels (+0.28 to +0.44), not a fairness audit
+3. **Hardest category:** edge_case (MAE 1.33) — conflicting dimensions and subtle failures
+4. **Observed blind spots:** conciseness penalties and instruction-following completeness
+5. **Scope caveat:** Single model (Claude Haiku), 23 cases, 3 trials — illustrative, not generalized evidence
 
-## Related Work & Validation
+## Related Work (light parallels, not claims)
 
-These findings align with published research on LLM-as-Judge evaluation:
-
-- **Chain-of-thought effectiveness**: Wei et al. (2022) and Kojima et al. (2023) demonstrated that explicit reasoning improves LLM performance. This project replicates that finding: CoT variance (0.0116) is 3.5× lower than zero-shot (0.0406).
-
-- **Positive bias in LLM evaluators**: Zheng et al. (2023) in their LLMEval work found that LLMs systematically overrate responses. This project observes similar bias (+0.26 points on a 1-5 scale), consistent with their findings on larger models.
-
-- **Category difficulty variation**: Multi-dimensional evaluation literature shows that subjective and task-based judgments are inherently harder than factual queries. Our results confirm this: task MAE (0.6) vs factual (0.35), reflecting the interpretation overhead required.
-
-- **Model-specific limitations**: The conciseness blind spot reflects a known LLM training bias toward verbose, helpful responses—documented in Constitutional AI research.
-
-These replications suggest the project's evaluation framework and findings are methodologically sound and representative of how LLMs perform as evaluators.
+This small exercise loosely parallels published LLM-as-judge findings (e.g., Wei et al. on chain-of-thought, Zheng et al. on overrating). Any resemblance is anecdotal: the dataset is tiny, model-specific, and results are for my own learning, not a replication.
 
 ## Cost
 
-Total experiment: **$0.03** (207 API calls using Claude Haiku)
+Total experiment: **~$0.034** (207 API calls using Claude Haiku)
 
-- Total tokens: 138,001
+- Total tokens: 137,288
 - Model: claude-3-haiku-20240307
 - Temperature: 0.3
 
-> **📊 Data Source:** Cost and token counts from `results/experiment_results_20260117_135429.json` metadata. Actual cost was $0.0345, rounded to $0.03 for readability.
+> **📊 Data Source:** Cost and token counts from `results/experiment_results_20260117_152828.json` metadata. Actual cost was ~$0.0343, rounded for readability.
 
 ## Reproducing These Results
 
