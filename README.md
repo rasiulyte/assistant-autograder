@@ -5,7 +5,7 @@ A portfolio project demonstrating autograder design for AI assistant responses, 
 
 ## Background & Motivation
 
-After 14 years of quality engineering at Microsoft, I noticed that AI systems fail differently than traditional software. Traditional bugs crash or throw errors—they're obvious. LLM failures are subtle: confident wrong answers, plausible hallucinations, responses that are technically correct but miss the user's intent.
+My background in traditional quality engineering shaped how I initially thought about failures. After spending time reading and experimenting with LLMs, I began to notice a different pattern: instead of obvious crashes or errors, failures are often subtle—confident but wrong answers, plausible hallucinations, or responses that are technically correct yet miss the user’s intent.
 
 This project explores a core question in GenAI evaluation: **How reliable are LLM-based autograders, and how do we validate them?**
 
