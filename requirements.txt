@@ -1,4 +1,4 @@
-# Siri Autograder Project - Requirements
+# AI Assistant Autograder Project - Requirements
 
 # Core dependencies
 anthropic>=0.18.0
