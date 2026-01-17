@@ -18,12 +18,12 @@ This project builds and validates an autograder system that evaluates AI assista
 1. **Rubric Design** - Structured evaluation criteria including safety
 2. **Prompt Engineering** - Multiple prompting strategies (zero-shot, few-shot, chain-of-thought)
 3. **Autograder Validation** - Measuring correlation with human judgment
-4. **Bias Detection** - Identifying systematic autograder limitations
+4. **Score Bias (over/under-rating vs human labels)** - Identifying where the autograder systematically scores higher or lower than ground truth. This is *not* demographic or fairness bias auditing.
 5. **Failure Analysis** - Pinpointing where autograders disagree with humans
 
 ## Scope & Limitations
 
-This repository is a personal learning exercise and a simplified illustration of LLM-as-judge autograding. It is not a production-ready framework—just a starting point I used to think through rubrics, prompting strategies, and validation for myself. 
+This repository is a personal learning exercise and a simplified illustration of LLM-as-judge autograding. It is not a production-ready framework—just a starting point I used to think through rubrics, prompting strategies, and validation for myself. Bias here refers only to over/under-rating relative to my labels (not demographic or fairness auditing).
 
 ## What This Project Does
 
@@ -55,7 +55,7 @@ From 207 API calls (23 test cases × 3 strategies × 3 trials):
 
 - **Variance 0.023**: When asked to score the same response 3 times, chain_of_thought gave nearly identical scores each time (lower = more consistent)
 - **MAE 0.516**: On average, Claude's scores were about 0.5 points away from human scores (on a 1-5 scale)
-- **Bias +0.284-0.443**: Claude tends to rate responses higher than humans do (positive = overrates)
+- **Bias +0.284-0.443**: Claude tends to rate responses higher than humans do (positive = overrates). This is score bias vs my labels, not demographic/fairness bias.
 
 ### How these metrics are calculated
 
