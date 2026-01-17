@@ -1,7 +1,7 @@
 
-# AI Assistant Response Autograder: LLM-as-Judge Evaluation System
+# AI Assistant Response Autograder: LLM-as-Judge Evaluation (personal learning)
 
-A showcase project demonstrating autograder design for AI assistant responses, built to explore prompt engineering techniques and LLM-as-Judge reliability.
+A small personal learning project exploring autograder design for AI assistant responses. This is not a production system—just a way I tested prompt strategies and checked how an LLM behaves as a judge on a tiny, hand-labeled set.
 
 ## Background & Motivation
 
@@ -52,7 +52,7 @@ From 207 API calls (23 test cases × 3 strategies × 3 trials):
 | zero_shot | 0.029 | **0.516** | +0.284 |
 | few_shot | 0.029 | 0.542 | +0.443 |
 
-**Best strategy: chain_of_thought** (most consistent), **zero_shot** (most accurate)
+**Best on this run:** chain_of_thought (most consistent), zero_shot (most accurate) on this small set.
 
 > **📊 Data Source:** These numbers come from `results/experiment_results_20260117_152828.json` 
 > and are calculated by `analyze_results.py`.
@@ -85,18 +85,16 @@ From 207 API calls (23 test cases × 3 strategies × 3 trials):
 
 > **📊 Data Source:** Categories defined in `test_cases.py` (see "category" field). MAE calculated by `analyze_results.py::analyze_by_category()`. Lower MAE = easier for Claude to evaluate correctly.
 
-#### ✅ Hypothesis Validated: Test Case Difficulty Matters
+#### Edge Cases (conflicting dimensions)
 
-**Problem:** Edge cases originally appeared "easiest" (MAE 0.2) because all responses had perfect 5/5 ground truth scores—no judgment needed.
-
-**Solution:** Replaced with cases where quality dimensions conflict:
+Current edge cases (this run):
 - `edge_01` (5,2,5,2,5): WiFi hacking refusal—correct but unhelpfully terse (safety ✓ but naturalness ✗)
 - `edge_02` (4,3,3,3,5): Political deflection—safe but evasive (avoids helping user)
 - `edge_03` (2,1,5,4,5): Instruction fail—fluent but wrong (misunderstood "repeat back exactly")
 
-**Result:** edge_case MAE increased **0.2 → 1.33** (now **hardest category** instead of easiest). 
+Result (current run): edge_case MAE = **1.33** (hardest category). 
 
-**Key insight:** Claude gives near-perfect scores (all 5s) to responses that *sound* good, even when they fail on specific dimensions. This validates that ground truth annotation quality directly impacts autograder performance—subtle failures are much harder to detect than obvious ones.
+Key insight: Claude gives near-perfect scores to responses that *sound* good, even when they fail on specific dimensions. Ground truth quality directly affects autograder performance—subtle failures are harder to detect than obvious ones.
 
 ### Key Failures Found
 
