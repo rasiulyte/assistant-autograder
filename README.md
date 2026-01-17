@@ -45,7 +45,7 @@ From 207 API calls (23 test cases × 3 strategies × 3 trials):
 **Best strategy: chain_of_thought** (most consistent AND most accurate)
 
 > **📊 Data Source:** These numbers come from `results/experiment_results_20260117_135429.json` 
-> and are calculated by `analyze_results.py`. See [GETTING_STARTED.md](GETTING_STARTED.md) to learn what each metric means.
+> and are calculated by `analyze_results.py`.
 
 ### What the numbers mean
 
@@ -60,8 +60,6 @@ From 207 API calls (23 test cases × 3 strategies × 3 trials):
 **MAE (accuracy)**: For each dimension, we compare Claude's average score to the human ground truth score (from `test_cases.py`), take the absolute difference, then average across all test cases. Lower = more accurate. See `analyze_results.py::analyze_ground_truth_correlation()`.
 
 **Bias**: Same as MAE but we keep the sign (positive means Claude scored higher than human). See `analyze_results.py::analyze_ground_truth_correlation()`.
-
-💡 **For detailed explanations with examples, see [GETTING_STARTED.md](GETTING_STARTED.md#key-metrics-explained)**
 
 ### Performance by Category
 
@@ -137,8 +135,6 @@ Cases where Claude disagreed with human scores by 2+ points:
 ```
 assistant-autograder/
 ├── README.md              # This file - project overview and results
-├── GETTING_STARTED.md     # Step-by-step guide for junior developers
-├── RESULTS_REFERENCE.md   # Quick lookup: where each number comes from
 ├── test_cases.py          # 23 Q&A pairs with human scores (ground truth)
 ├── rubrics.py             # What each score (1-5) means for each dimension
 ├── prompts.py             # 3 prompting strategies (zero-shot, few-shot, CoT)
@@ -157,8 +153,6 @@ analyze_results.py → Compares scores → analysis_report.txt
        ↓
 README.md (copy key findings here)
 ```
-
-💡 **For detailed flow diagrams, see [GETTING_STARTED.md](GETTING_STARTED.md#the-big-picture-how-everything-connects)**
 
 ## How to Run
 
@@ -182,8 +176,6 @@ python analyze_results.py
 **What these scripts do:**
 - `run_autograder.py`: Calls Claude API 207 times (23 cases × 3 strategies × 3 trials), saves raw scores to `results/experiment_results_YYYYMMDD_HHMMSS.json`
 - `analyze_results.py`: Calculates statistics from the JSON file, generates `results/analysis_report.txt`
-
-**New to the project?** Start with [GETTING_STARTED.md](GETTING_STARTED.md) for a step-by-step guide!
 
 ## The 5 Evaluation Dimensions
 
@@ -253,9 +245,4 @@ To reproduce:
 Rasa Rasiulytė  
 GitHub: [github.com/rasiulyte](https://github.com/rasiulyte)
 
-## Documentation
 
-- **[GETTING_STARTED.md](GETTING_STARTED.md)** - Complete walkthrough for junior developers
-- **[RESULTS_REFERENCE.md](RESULTS_REFERENCE.md)** - Quick lookup: where each metric comes from
-- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
-- **[.github/copilot-instructions.md](.github/copilot-instructions.md)** - AI coding assistant guidance
