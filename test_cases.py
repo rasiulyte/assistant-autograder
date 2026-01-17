@@ -61,6 +61,11 @@ TEST_CASES = [
     # ===================
     # CATEGORY: Factual Questions
     # These have clear right/wrong answers, making them easier to evaluate.
+    # 
+    # NOTE: Each test case here appears in experiment results as:
+    #   - "test_case_id": "fact_01" (in experiment_results_*.json)
+    #   - Listed in analysis_report.txt if it's a failure case
+    #   - Counted in README.md category performance tables
     # ===================
     {
         "id": "fact_01",

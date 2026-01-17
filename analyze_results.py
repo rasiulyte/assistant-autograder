@@ -102,6 +102,11 @@ def analyze_consistency(results):
         This function measures how much the scores varied across trials.
         
         Lower variance = more consistent = better
+        
+    WHERE THIS APPEARS IN RESULTS:
+        - README.md Table: "Consistency (variance)" column
+        - analysis_report.txt: Section 1 "RUN-TO-RUN CONSISTENCY"
+        - Example: chain_of_thought variance = 0.012 means scores were nearly identical
     
     HOW IT WORKS:
         1. For each test case and strategy, collect all scores from 3 trials
@@ -169,6 +174,12 @@ def analyze_ground_truth_correlation(results):
     WHAT THIS MEASURES:
         - MAE (Mean Absolute Error): How far off is Claude's score on average?
         - Bias: Does Claude systematically over-rate or under-rate?
+        
+    WHERE THIS APPEARS IN RESULTS:
+        - README.md Table: "Accuracy (MAE)" and "Bias" columns
+        - analysis_report.txt: Section 2 "CORRELATION WITH HUMAN LABELS"
+        - Example: MAE 0.348 = Claude's scores are typically 0.35 points off
+        - Example: Bias +0.261 = Claude scores 0.26 points higher than humans
     
     HOW MAE IS CALCULATED:
         1. For each test case, average Claude's scores across 3 trials
@@ -176,7 +187,7 @@ def analyze_ground_truth_correlation(results):
         3. Average all errors across test cases and dimensions
         
         Example:
-            Human rated correctness as 3
+            Human rated correctness as 3 (from test_cases.py ground_truth)
             Claude's 3 trials: [4, 4, 5] -> average = 4.33
             Error = |4.33 - 3| = 1.33
     
@@ -261,8 +272,13 @@ def analyze_by_category(results):
     PURPOSE:
         Different types of queries may be easier or harder to evaluate.
         This function shows which categories Claude struggles with most.
+        
+    WHERE THIS APPEARS IN RESULTS:
+        - README.md Table: "Performance by Category" table
+        - analysis_report.txt: Section 3 "PERFORMANCE BY CATEGORY"
+        - Shows which query types have highest/lowest MAE
     
-    CATEGORIES IN THIS EXPERIMENT:
+    CATEGORIES IN THIS EXPERIMENT (defined in test_cases.py):
         - factual: Questions with clear right/wrong answers (e.g., "capital of France")
         - task: Commands to do something (e.g., "set a timer")
         - subjective: Opinion questions (e.g., "best restaurant nearby")
@@ -272,9 +288,13 @@ def analyze_by_category(results):
         - edge_case: Unusual inputs (e.g., gibberish, jokes)
     
     HOW IT WORKS:
-        1. Group test cases by category
+        1. Group test cases by category (from test_cases.py "category" field)
         2. For each category, calculate MAE across all dimensions
         3. Sort by MAE to see hardest vs easiest categories
+        
+    INTERPRETING RESULTS:
+        - Higher MAE = Claude struggles more with this category
+        - task (MAE=0.600) = hardest, edge_case (MAE=0.200) = easiest
     
     Returns:
         dict: MAE by dimension and overall for each category
@@ -322,6 +342,11 @@ def identify_failure_cases(results):
         - What types of responses Claude misjudges
         - Which dimensions are most problematic
         - How to improve the autograder
+        
+    WHERE THIS APPEARS IN RESULTS:
+        - README.md: "Key Failures Found" section (lists top 4 failures)
+        - analysis_report.txt: Section 4 "SIGNIFICANT DISAGREEMENTS"
+        - Shows test_case_id (from test_cases.py) + what went wrong
     
     THRESHOLD:
         We use 2+ points as the threshold because:
@@ -329,14 +354,14 @@ def identify_failure_cases(results):
         - 1-point differences could be reasonable disagreement
         - 2+ points suggests Claude fundamentally misunderstood something
     
-    EXAMPLE FAILURE:
+    EXAMPLE FAILURE (from test_case "fact_03"):
         Query: "What is the capital of Australia?"
         Response: "The capital is Sydney." (WRONG - it's Canberra)
         
-        Human scored completeness: 1 (can't be complete if wrong)
-        Claude scored completeness: 5 (thought it answered the question)
+        Human scored completeness: 1 (from test_cases.py ground_truth)
+        Claude scored completeness: 5 (from experiment results JSON)
         
-        Error: |5 - 1| = 4 points -> FAILURE
+        Error: |5 - 1| = 4 points -> FAILURE (listed in README)
     
     Returns:
         list: Failure cases sorted by error magnitude (worst first)
@@ -372,7 +397,24 @@ def identify_failure_cases(results):
 
 
 def generate_report(results):
-    """Generate a formatted analysis report."""
+    """
+    Generate a formatted analysis report.
+    
+    OUTPUT FILES:
+        - results/analysis_report.txt: Full detailed report
+        - Console output: Same content printed to screen
+        
+    CONTENT SOURCES:
+        - Section 1 (Consistency): From analyze_consistency()
+        - Section 2 (Correlation): From analyze_ground_truth_correlation()
+        - Section 3 (By Category): From analyze_by_category()
+        - Section 4 (Failures): From identify_failure_cases()
+        
+    README INTEGRATION:
+        - Variance/MAE/Bias table: Copy from Section 1 & 2
+        - Category table: Copy from Section 3
+        - Key Failures: Copy top 4 from Section 4
+    """
     
     consistency = analyze_consistency(results)
     correlation = analyze_ground_truth_correlation(results)
@@ -497,13 +539,44 @@ def main():
     filepath = sys.argv[1] if len(sys.argv) > 1 else None
     results = load_results(filepath)
     
+    print(f"")
+    print(f"=" * 70)
+    print(f"ANALYZING EXPERIMENT RESULTS")
+    print(f"=" * 70)
+    print(f"")
+    
     report = generate_report(results)
     print(report)
     
     report_path = Path("results") / "analysis_report.txt"
     with open(report_path, "w") as f:
         f.write(report)
-    print(f"\nReport saved to: {report_path}")
+    
+    print(f"")
+    print(f"=" * 70)
+    print(f"ANALYSIS COMPLETE")
+    print(f"=" * 70)
+    print(f"Report saved to: {report_path}")
+    print(f"")
+    print(f"Key findings:")
+    
+    # Extract and display key findings
+    consistency = analyze_consistency(results)
+    correlation = analyze_ground_truth_correlation(results)
+    
+    best_consistency = min(consistency.keys(), key=lambda s: consistency[s]['overall_mean_variance'])
+    best_accuracy = min(correlation.keys(), key=lambda s: correlation[s]['overall_mae'])
+    
+    print(f"  ✓ Most consistent: {best_consistency} (variance={consistency[best_consistency]['overall_mean_variance']})")
+    print(f"  ✓ Most accurate: {best_accuracy} (MAE={correlation[best_accuracy]['overall_mae']})")
+    print(f"")
+    print(f"To update README.md:")
+    print(f"  1. Copy variance/MAE/bias from Section 2 of the report")
+    print(f"  2. Copy category table from Section 3")
+    print(f"  3. Copy top 4 failures from Section 4")
+    print(f"")
+    print(f"See RESULTS_REFERENCE.md for help understanding these numbers.")
+    print(f"=" * 70)
 
 
 if __name__ == "__main__":

@@ -77,15 +77,27 @@ def extract_json_scores(response_text: str) -> dict | None:
     """
     Extract the JSON scores from Claude's response.
     
-    Claude's response might include reasoning text before/after the JSON.
-    This function finds the JSON block and extracts just the scores.
+    WHY THIS IS NEEDED:
+        Claude sometimes includes reasoning text before/after the JSON.
+        Example response:
+            "The response is excellent because... ```json\n{...}```"
+        
+        We need to extract just the JSON part: {...}
     
-    Args:
-        response_text: The full text response from Claude
-    
-    Returns:
+    VALIDATION:
+        Checks that all 5 dimensions are present:
+          - correctness, completeness, conciseness, naturalness, safety
+        Checks that each score is a number between 1-5
+        
+    RETURNS:
         dict: The scores like {"correctness": 5, "completeness": 4, ...}
         None: If we couldn't find or parse valid scores
+              (These cases are marked success=False in results)
+    
+    USED BY:
+        - run_single_evaluation() in this file
+        - Results saved to experiment_results_*.json
+        - Failed extractions excluded from variance calculations
     
     Example:
         response = "The response is good. ```json\n{\"correctness\": 5}```"
@@ -213,9 +225,12 @@ def run_experiment():
     # Calculate total number of API calls
     total_calls = len(test_cases) * len(strategies) * NUM_TRIALS
     print(f"Starting experiment: {total_calls} total API calls")
-    print(f"  - {len(test_cases)} test cases")
-    print(f"  - {len(strategies)} strategies")
-    print(f"  - {NUM_TRIALS} trials each")
+    print(f"  - {len(test_cases)} test cases (from test_cases.py)")
+    print(f"  - {len(strategies)} strategies (from prompts.py)")
+    print(f"  - {NUM_TRIALS} trials each (for consistency measurement)")
+    print(f"")
+    print(f"Results will be saved to: results/experiment_results_YYYYMMDD_HHMMSS.json")
+    print(f"Run 'python analyze_results.py' after this completes to see metrics.")
     print()
     
     call_count = 0
@@ -252,6 +267,8 @@ def run_experiment():
                 )
                 
                 # Print result (✓ for success, ✗ for failure)
+                # These scores will be saved to results/experiment_results_*.json
+                # and compared against ground_truth from test_cases.py
                 if result["success"]:
                     print(f"✓ {result['scores']}")
                 else:
@@ -280,6 +297,11 @@ def run_experiment():
     # -----------------------------------------------------------------
     # COST ESTIMATION
     # -----------------------------------------------------------------
+    # WHERE THIS APPEARS IN RESULTS:
+    #   - Saved to experiment_results_*.json metadata section
+    #   - Displayed in analysis_report.txt "Experiment Configuration"
+    #   - Referenced in README.md "Cost" section
+    #
     # Claude Haiku pricing (as of 2024):
     #   Input tokens:  $0.25 per million tokens  = $0.00000025 per token
     #   Output tokens: $1.25 per million tokens  = $0.00000125 per token
@@ -288,7 +310,7 @@ def run_experiment():
     # (our prompts are input-heavy, so this is a reasonable approximation)
     #
     # Actual breakdown for this experiment:
-    #   Total tokens: ~138,000
+    #   Total tokens: ~138,000 (tracked from each API call)
     #   Estimated cost: 138,000 × $0.00000025 ≈ $0.035
     #
     # This is a ROUGH ESTIMATE. For precise costs, check your Anthropic
@@ -303,10 +325,23 @@ def run_experiment():
         json.dump(results, f, indent=2)
     
     # Print summary
+    print(f"")
+    print(f"=" * 60)
+    print(f"EXPERIMENT COMPLETE!")
+    print(f"=" * 60)
     print(f"Results saved to: {output_file}")
     print(f"Total API calls: {call_count}")
     print(f"Total tokens: {total_tokens:,}")
     print(f"Estimated cost: ${results['metadata']['estimated_cost_usd']:.4f}")
+    print(f"")
+    print(f"Next step: Run 'python analyze_results.py' to see:")
+    print(f"  - Consistency (variance): How much do scores vary across trials?")
+    print(f"  - Accuracy (MAE): How close are Claude's scores to human scores?")
+    print(f"  - Bias: Does Claude over-rate or under-rate?")
+    print(f"  - Failures: Which cases had big disagreements?")
+    print(f"")
+    print(f"See GETTING_STARTED.md for help understanding the results.")
+    print(f"=" * 60)
     
     return results
 
