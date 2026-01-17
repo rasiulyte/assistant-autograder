@@ -1,3 +1,6 @@
+Here's the updated README with your findings. Copy this entire text:
+
+```markdown
 # AI Assistant Response Autograder: LLM-as-Judge Evaluation System
 
 A portfolio project demonstrating autograder design for AI assistant responses, built to explore prompt engineering techniques and LLM-as-Judge reliability.
@@ -8,7 +11,7 @@ After 14 years of quality engineering at Microsoft, I noticed that AI systems fa
 
 This project explores a core question in GenAI evaluation: **How reliable are LLM-based autograders, and how do we validate them?**
 
-I hand-labeled 20 test cases with ground truth scores (the annotation work that underpins any evaluation system), then built and validated multiple autograder approaches to measure their correlation with human judgment.
+I hand-labeled 23 test cases with ground truth scores (the annotation work that underpins any evaluation system), then built and validated multiple autograder approaches to measure their correlation with human judgment.
 
 ## Project Overview
 
@@ -24,7 +27,7 @@ This project builds and validates an autograder system that evaluates AI assista
 
 ```bash
 # Install dependencies
-pip install anthropic pandas numpy
+pip install anthropic
 
 # Set your API key
 export ANTHROPIC_API_KEY="your-key-here"
@@ -71,12 +74,14 @@ The safety dimension is critical for production AI systems—an autograder must 
 
 ## Key Findings
 
-[To be completed after running experiment]
-
-- Run-to-run consistency: X%
-- Prompt strategy impact: ...
-- Identified biases: ...
-- Correlation with human labels: ...
+- **Most consistent strategy:** few_shot (variance: 0.017)
+- **Most accurate strategy:** few_shot (MAE: 0.351)
+- **Bias detected:** All strategies overrate responses (+0.08 to +0.28)
+- **Hardest category:** task (MAE: 0.6)
+- **Easiest category:** factual (MAE: 0.25)
+- **Key weakness:** Autograder misses conciseness issues - rates verbose answers as perfect
+- **Safety evaluation:** Very accurate (MAE: 0.01-0.04)
+- **Cost:** $0.03 for 207 evaluations
 
 ## From Findings to Action: Hillclimbing the Autograder
 
@@ -128,7 +133,7 @@ Autograders don't replace human judgment—they augment it. Here's how they work
 
 ### Building the Golden Dataset
 
-This project's 20 test cases were hand-labeled following this process:
+This project's 23 test cases were hand-labeled following this process:
 
 1. **Sampling**: Select diverse queries across categories
 2. **Annotation guidelines**: Define clear rubrics before labeling
@@ -145,7 +150,7 @@ In production, track:
 
 ## Scaling Considerations
 
-This experiment runs ~180 evaluations for demonstration purposes. In production, autograders must handle millions of daily evaluations. Here's how to scale:
+This experiment runs ~207 evaluations for demonstration purposes. In production, autograders must handle millions of daily evaluations. Here's how to scale:
 
 ### Tiered Evaluation Architecture
 
@@ -220,7 +225,8 @@ This project maps directly to GenAI evaluation role requirements:
 | Building/evaluating GenAI models | End-to-end autograder implementation |
 | Diagnosing autograder limitations | Bias detection, failure case analysis |
 | Synthesizing actionable insights | Findings → hillclimbing methodology |
-| Human annotation operations | Hand-labeled 20 test cases with ground truth |
+| Human annotation operations | Hand-labeled 23 test cases with ground truth |
 | Human-in-the-loop workflows | Integrated human/automation decision framework |
 | Quality and safety standards | 5-dimension rubric including safety |
 | LLMOps (monitoring, hillclimbing) | Iteration methodology, production architecture |
+```
