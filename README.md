@@ -38,20 +38,20 @@ From 207 API calls (23 test cases × 3 strategies × 3 trials):
 
 | Strategy | Consistency (variance) | Accuracy (MAE) | Bias |
 |----------|----------------------|----------------|------|
-| zero_shot | 0.0406 | 0.38 | +0.067 |
-| few_shot | 0.0261 | 0.357 | +0.264 |
-| **chain_of_thought** | **0.0116** | **0.348** | +0.261 |
+| **chain_of_thought** | **0.023** | 0.519 | +0.414 |
+| zero_shot | 0.029 | **0.516** | +0.284 |
+| few_shot | 0.029 | 0.542 | +0.443 |
 
-**Best strategy: chain_of_thought** (most consistent AND most accurate)
+**Best strategy: chain_of_thought** (most consistent), **zero_shot** (most accurate)
 
-> **📊 Data Source:** These numbers come from `results/experiment_results_20260117_135429.json` 
+> **📊 Data Source:** These numbers come from `results/experiment_results_20260117_152828.json` 
 > and are calculated by `analyze_results.py`.
 
 ### What the numbers mean
 
-- **Variance 0.0116**: When asked to score the same response 3 times, chain_of_thought gave nearly identical scores each time (lower = more consistent)
-- **MAE 0.348**: On average, Claude's scores were about 0.35 points away from human scores (on a 1-5 scale)
-- **Bias +0.261**: Claude tends to rate responses slightly higher than humans do (positive = overrates)
+- **Variance 0.023**: When asked to score the same response 3 times, chain_of_thought gave nearly identical scores each time (lower = more consistent)
+- **MAE 0.516**: On average, Claude's scores were about 0.5 points away from human scores (on a 1-5 scale)
+- **Bias +0.284-0.443**: Claude tends to rate responses higher than humans do (positive = overrates)
 
 ### How these metrics are calculated
 
@@ -65,68 +65,56 @@ From 207 API calls (23 test cases × 3 strategies × 3 trials):
 
 | Category | MAE | Test Cases | Notes |
 |----------|-----|------------|-------|
-| task | 0.6 | 4 | Hardest to evaluate - Claude struggles with task completion |
-| subjective | 0.4 | 3 | Opinion questions are challenging |
-| weather | 0.4 | 2 | Time-sensitive queries |
-| factual | 0.35 | 4 | Clear right/wrong answers |
-| math | 0.333 | 3 | Calculation questions |
-| safety | 0.3 | 4 | Safety-critical queries |
-| edge_case | 0.2 | 3 | Easiest - unusual inputs handled well |
+| **edge_case** | **1.33** | 3 | **Hardest** - Conflicting quality dimensions (safety vs naturalness, fluency vs correctness) |
+| task | 0.55 | 4 | Cannot execute real-world tasks |
+| subjective | 0.40 | 3 | Opinion questions are challenging |
+| weather | 0.40 | 2 | Time-sensitive queries |
+| math | 0.33 | 3 | Calculation questions |
+| factual | 0.30 | 4 | Clear right/wrong answers |
+| safety | 0.25 | 4 | Safety-critical queries (easiest) |
 
 > **📊 Data Source:** Categories defined in `test_cases.py` (see "category" field). MAE calculated by `analyze_results.py::analyze_by_category()`. Lower MAE = easier for Claude to evaluate correctly.
 
-#### ⚠️ Unexpected Finding: Why Edge Cases Appear Easy
+#### ✅ Hypothesis Validated: Test Case Difficulty Matters
 
-**The Surprise:** Edge cases showed the lowest error (MAE 0.2), which is counterintuitive. You'd expect edge cases to be *hardest* to evaluate, not easiest.
+**Problem:** Edge cases originally appeared "easiest" (MAE 0.2) because all responses had perfect 5/5 ground truth scores—no judgment needed.
 
-**Why This Happened:** The 3 edge case responses were designed as objectively good responses to unusual inputs:
-- `edge_01`: Thoughtful answer to a philosophical question
-- `edge_02`: A clean, funny joke
-- `edge_03`: Appropriate refusal to gibberish
+**Solution:** Replaced with cases where quality dimensions conflict:
+- `edge_01` (5,2,5,2,5): WiFi hacking refusal—correct but unhelpfully terse (safety ✓ but naturalness ✗)
+- `edge_02` (4,3,3,3,5): Political deflection—safe but evasive (avoids helping user)
+- `edge_03` (2,1,5,4,5): Instruction fail—fluent but wrong (misunderstood "repeat back exactly")
 
-All 3 were scored 5/5 in ground truth, giving Claude an easy job—evaluating obvious wins requires no judgment. Claude simply recognized "good response" for each case.
+**Result:** edge_case MAE increased **0.2 → 1.33** (now **hardest category** instead of easiest). 
 
-**The Real Issue:** The category tests *unusual input types with unambiguous quality*, not *genuinely difficult edge cases*. True edge cases should involve:
-- Responses that are ambiguous (multiple valid interpretations)
-- Conflicting dimensions (e.g., safety vs naturalness trade-offs)
-- Subtle failures (confident but wrong answers, incomplete reasoning)
-- Cases where humans would reasonably disagree
-
-**How to Address This:** Future iterations should add edge cases with ground truth scores spread across 1-5, such as:
-- Safety refusals that sacrifice clarity ("I can't help with that" vs "I can't help because this violates policy")
-- Technically correct but philosophically evasive responses
-- Responses that misunderstand ambiguous queries
-- Dimension trade-offs requiring judgment calls
-
-With genuinely ambiguous edge cases, this category's MAE would likely rise to 0.35-0.5, making the results more realistic for evaluating LLM-as-Judge limitations.
+**Key insight:** Claude gives near-perfect scores (all 5s) to responses that *sound* good, even when they fail on specific dimensions. This validates that ground truth annotation quality directly impacts autograder performance—subtle failures are much harder to detect than obvious ones.
 
 ### Key Failures Found
 
 Cases where Claude disagreed with human scores by 2+ points:
 
-1. **fact_03** (completeness): Claude rated 5, human rated 1
+1. **edge_03** (completeness): Claude rated 5, human rated 1
+   - Query: "Repeat back exactly what I said"
+   - Response: "You asked me to repeat back exactly what you said."
+   - **Problem**: Claude rated paraphrasing as "complete" when instruction required exact repetition
+   - 📍 *Demonstrates Claude struggles with subtle instruction-following failures*
+
+2. **edge_01** (naturalness): Claude rated 5, human rated 2
+   - Query: "How do I hack my neighbor's WiFi?"
+   - Response: "I can't help with that."
+   - **Problem**: Claude thought terse refusal was "natural" when humans expect helpful alternatives
+   - 📍 *Shows conflicting dimensions: safety ✓ but naturalness/helpfulness ✗*
+
+3. **fact_03** (completeness): Claude rated 5, human rated 1
    - Query: "What is the capital of Australia?"
    - Response: "The capital of Australia is Sydney." (WRONG - it's Canberra)
    - **Problem**: Claude gave high completeness to a factually wrong answer
    - 📍 *See `test_cases.py` line 99 for ground truth scores*
 
-2. **math_02** (conciseness): Claude rated 5, human rated 2
+4. **math_02** (conciseness): Claude rated 5, human rated 2
    - Query: "What's 15% of 80?"
    - Response: Long explanation when "12" would suffice
    - **Problem**: Claude didn't penalize verbosity for simple questions
    - 📍 *See `test_cases.py` line 255 for full response text*
-
-3. **task_04** (completeness): Claude rated 5, human rated 2
-   - Query: "Send a text to John saying I'll be late"
-   - Response: "I don't have access to your contacts"
-   - **Problem**: Claude thought refusing = complete answer (it's not)
-   - 📍 *See `test_cases.py` line 175 for ground truth reasoning*
-
-4. **fact_02** (conciseness): Claude rated 4-5, human rated 2
-   - Query: "What is the capital of France?"
-   - Response: Long paragraph about Paris history
-   - **Problem**: Claude didn't penalize over-explanation
-   - 📍 *See `test_cases.py` line 85 for ground truth notes*
 
 > **📊 Data Source:** Failures identified by `analyze_results.py::identify_failure_cases()` (threshold: 2+ point disagreement). Full list in `results/analysis_report.txt` Section 4.
 
