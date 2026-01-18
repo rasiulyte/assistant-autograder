@@ -1,5 +1,4 @@
-
-# AI Assistant Response Autograder: LLM-as-Judge Evaluation (personal learning)
+# AI Assistant Response Autograder: LLM-as-Judge Evaluation
 
 A personal learning project exploring how to use language models as judges for AI assistant responses.
 
