@@ -28,8 +28,6 @@ python analyze_results.py
 
 ## Background & Motivation
 
-Traditional software fails loudly—crashes, errors, exceptions. AI systems fail differently. Confident but wrong. Plausible but fabricated. Technically correct but missing the point.
-
 This project explores a core question: How reliable are LLM-based autograders, and how do we know?
 
 I hand-labeled 23 test cases with ground truth scores, then built multiple autograder strategies to measure how well they correlate with human judgment.
