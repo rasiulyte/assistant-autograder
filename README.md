@@ -200,10 +200,6 @@ README.md (copy key findings here)
 4. **Observed blind spots:** conciseness penalties and instruction-following completeness
 5. **Scope caveat:** Single model (Claude Haiku), 23 cases, 3 trials — illustrative, not generalized evidence
 
-## Related Work (light parallels, not claims)
-
-This small exercise loosely parallels published LLM-as-judge findings (e.g., Wei et al. on chain-of-thought, Zheng et al. on overrating). Any resemblance is anecdotal: the dataset is tiny, model-specific, and results are for my own learning, not a replication.
-
 ## Cost
 
 Total experiment: **~$0.034** (207 API calls using Claude Haiku)
