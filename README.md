@@ -1,7 +1,31 @@
 
 # AI Assistant Response Autograder: LLM-as-Judge Evaluation (personal learning)
 
-A personal learning project exploring how to use language models as judges for AI assistant responses. 
+A personal learning project exploring how to use language models as judges for AI assistant responses.
+
+## How to Run
+
+```bash
+# Install dependencies
+pip install anthropic
+
+# Set API key (Mac/Linux)
+export ANTHROPIC_API_KEY="your-key"
+
+# Set API key (Windows PowerShell)
+$env:ANTHROPIC_API_KEY="your-key"
+
+# Run experiment (~10-15 min, ~$0.03)
+python run_autograder.py
+
+# Analyze results
+python analyze_results.py
+```
+
+**What these scripts do:**
+- `run_autograder.py`: Calls Claude API 207 times (23 cases × 3 strategies × 3 trials), saves raw scores to `results/experiment_results_YYYYMMDD_HHMMSS.json`
+- `analyze_results.py`: Calculates statistics from the JSON file, generates `results/analysis_report.txt`
+
 ## Background & Motivation
 
 Traditional software fails loudly—crashes, errors, exceptions. AI systems fail differently. Confident but wrong. Plausible but fabricated. Technically correct but missing the point.
@@ -10,14 +34,9 @@ This project explores a core question: How reliable are LLM-based autograders, a
 
 I hand-labeled 23 test cases with ground truth scores, then built multiple autograder strategies to measure how well they correlate with human judgment.
 
-
-
 ## Project Overview
 
-This project builds and validates an autograder system that evaluates AI assistant responses across multiple quality dimensions. 
-Not a production system. A way to test assumptions and build intuition about where LLM-as-judge works and where it drifts.
-
-It demonstrates:
+This project builds and validates an autograder system that evaluates AI assistant responses across multiple quality dimensions. It demonstrates:
 
 1. **Rubric Design** - Structured evaluation criteria including safety
 2. **Prompt Engineering** - Multiple prompting strategies (zero-shot, few-shot, chain-of-thought)
@@ -154,29 +173,6 @@ analyze_results.py → Compares scores → analysis_report.txt
 README.md (copy key findings here)
 ```
 
-## How to Run
-
-```bash
-# Install dependencies
-pip install anthropic
-
-# Set API key (Mac/Linux)
-export ANTHROPIC_API_KEY="your-key"
-
-# Set API key (Windows PowerShell)
-$env:ANTHROPIC_API_KEY="your-key"
-
-# Run experiment (~10-15 min, ~$0.03)
-python run_autograder.py
-
-# Analyze results
-python analyze_results.py
-```
-
-**What these scripts do:**
-- `run_autograder.py`: Calls Claude API 207 times (23 cases × 3 strategies × 3 trials), saves raw scores to `results/experiment_results_YYYYMMDD_HHMMSS.json`
-- `analyze_results.py`: Calculates statistics from the JSON file, generates `results/analysis_report.txt`
-
 ## The 5 Evaluation Dimensions
 
 | Dimension | What it measures | Example |
@@ -233,6 +229,5 @@ To reproduce:
 
 Rasa Rasiulytė  
 GitHub: [github.com/rasiulyte](https://github.com/rasiulyte)
-Portfolio: http://www.rasar.ai
 
 
