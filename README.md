@@ -223,6 +223,24 @@ To reproduce:
 2. Run `python analyze_results.py` to calculate metrics
 3. Results may vary slightly due to LLM non-determinism (temperature=0.3)
 
+## Resources
+
+Wei et al., “Chain-of-Thought Prompting Elicits Reasoning in Large Language Models,” 2022.
+Link (arXiv): https://arxiv.org/abs/2201.11903
+
+“Improving LLM-as-a-Judge Inference with the Judgment Distribution” (Findings of EMNLP 2025):
+PDF: https://aclanthology.org/2025.findings-emnlp.1259.pdf
+
+“Overconfidence in LLM-as-a-Judge: Diagnosis and Confidence Calibration” (2024):
+HTML: https://arxiv.org/html/2508.06225v2
+arXiv entry: https://arxiv.org/abs/2508.06225
+
+“A Survey on LLM-as-a-Judge” (2024): 
+https://arxiv.org/abs/2411.15594
+​
+“LLMs instead of Human Judges? A Large Scale Empirical Study …” (2025): 
+https://pure.mpg.de/rest/items/item_3650876_3/component/file_3659400/content
+
 ## Author
 
 Rasa Rasiulytė  
