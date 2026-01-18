@@ -223,28 +223,38 @@ To reproduce:
 2. Run `python analyze_results.py` to calculate metrics
 3. Results may vary slightly due to LLM non-determinism (temperature=0.3)
 
-## Resources
+## Academic Research Resources
+
+The following are **peer-reviewed or preprint academic research papers** relevant to AI evaluation, LLM reasoning, and *LLM-as-a-Judge* research.
+
+---
 
 - **Wei et al. (2022)**  
   *Chain-of-Thought Prompting Elicits Reasoning in Large Language Models*  
-  arXiv: https://arxiv.org/abs/2201.11903
+  arXiv: https://arxiv.org/abs/2201.11903  
+  **Tags:** `prompting`, `reasoning`, `chain-of-thought`, `foundational`
 
 - **Findings of EMNLP (2025)**  
   *Improving LLM-as-a-Judge Inference with the Judgment Distribution*  
-  PDF: https://aclanthology.org/2025.findings-emnlp.1259.pdf
+  PDF: https://aclanthology.org/2025.findings-emnlp.1259.pdf  
+  **Tags:** `llm-as-a-judge`, `evaluation`, `calibration`, `distributional-methods`
 
 - **(2024)**  
   *Overconfidence in LLM-as-a-Judge: Diagnosis and Confidence Calibration*  
   HTML: https://arxiv.org/html/2508.06225v2  
-  arXiv: https://arxiv.org/abs/2508.06225
+  arXiv: https://arxiv.org/abs/2508.06225  
+  **Tags:** `llm-as-a-judge`, `overconfidence`, `confidence-calibration`, `risk-analysis`
 
 - **(2024)**  
   *A Survey on LLM-as-a-Judge*  
-  arXiv: https://arxiv.org/abs/2411.15594
+  arXiv: https://arxiv.org/abs/2411.15594  
+  **Tags:** `survey`, `llm-as-a-judge`, `evaluation-methods`, `benchmarking`
 
 - **(2025)**  
   *LLMs Instead of Human Judges? A Large-Scale Empirical Study*  
-  Full text: https://pure.mpg.de/rest/items/item_3650876_3/component/file_3659400/content
+  Full text: https://pure.mpg.de/rest/items/item_3650876_3/component/file_3659400/content  
+  **Tags:** `human-vs-llm`, `empirical-study`, `evaluation-reliability`, `scaling`
+
 
 
 ## Author
