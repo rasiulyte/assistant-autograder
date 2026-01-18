@@ -1,19 +1,23 @@
 
 # AI Assistant Response Autograder: LLM-as-Judge Evaluation (personal learning)
 
-A small personal learning project exploring autograder design for AI assistant responses. This is not a production system—just a way I tested prompt strategies and checked how an LLM behaves as a judge on a tiny, hand-labeled set.
-
+A personal learning project exploring how to use language models as judges for AI assistant responses. 
 ## Background & Motivation
 
-My background in traditional quality engineering shaped how I initially thought about failures. After spending time reading and experimenting with LLMs, I began to notice a different pattern: instead of obvious crashes or errors, failures are often subtle—confident but wrong answers, plausible hallucinations, or responses that are technically correct yet miss the user’s intent.
+Traditional software fails loudly—crashes, errors, exceptions. AI systems fail differently. Confident but wrong. Plausible but fabricated. Technically correct but missing the point.
 
-This project explores a core question in GenAI evaluation: **How reliable are LLM-based autograders, and how do we validate them?**
+This project explores a core question: How reliable are LLM-based autograders, and how do we know?
 
-I hand-labeled 23 test cases with ground truth scores (the annotation work that underpins any evaluation system), then built and validated multiple autograder approaches to measure their correlation with human judgment.
+I hand-labeled 23 test cases with ground truth scores, then built multiple autograder strategies to measure how well they correlate with human judgment.
+
+
 
 ## Project Overview
 
-This project builds and validates an autograder system that evaluates AI assistant responses across multiple quality dimensions. It demonstrates:
+This project builds and validates an autograder system that evaluates AI assistant responses across multiple quality dimensions. 
+Not a production system. A way to test assumptions and build intuition about where LLM-as-judge works and where it drifts.
+
+It demonstrates:
 
 1. **Rubric Design** - Structured evaluation criteria including safety
 2. **Prompt Engineering** - Multiple prompting strategies (zero-shot, few-shot, chain-of-thought)
